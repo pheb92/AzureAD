@@ -1,0 +1,34 @@
+# Create and add extension attributes to Azure AD user objects
+# Original code from: https://learn.microsoft.com/en-us/powershell/azure/active-directory/using-extension-attributes-sample?view=azureadps-2.0
+
+# Connect to Azure AD
+
+Connect-AzureAD
+
+# Create an app object to add custom extension attributes
+
+$AppObjectId = (New-AzureADApplication -DisplayName "Custom Extension Attributes").ObjectId 
+
+# Create a service principal for the app
+
+New-AzureADServicePrincipal -AppId (Get-AzureADApplication -SearchString "Custom Extension Attributes").AppId 
+
+# Create variable with the Object ID of the user
+
+$UserObjectID = "cf905c2b-a75f-448d-98f7-a455cdefcf32"
+
+#Enter a Name for the new extension attribute
+
+$ExtensionAttributeName = "Guest"
+
+# Create a new extension attribute
+
+$ExtensionName = (New-AzureADApplicationExtensionProperty -ObjectId $AppObjectId -Name $ExtensionAttributeName -DataType "String" -TargetObjects "User").Name
+
+# Add the extension to the user object
+
+Set-AzureADUserExtension -ObjectId $UserObjectID -ExtensionName $ExtensionName -ExtensionValue "Guest"
+
+# Get all extensions attributes of a user
+
+Get-AzureADUserExtension -ObjectId $UserObjectID
